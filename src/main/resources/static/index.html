@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobSaw - Google OAuth2 Testing</title>
+    <!-- Use basic CSS to make it look clean and well-structured -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 50px;
+            background-color: #f4f7f6;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #4285F4;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #357ae8;
+        }
+        .user-info {
+            display: none;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .user-info img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+        }
+        .login-section {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Welcome to JobSaw</h1>
+    
+    <div id="login-section" class="login-section">
+        <p>Please log in to continue.</p>
+        <a href="/oauth2/authorization/google" class="btn">Continue with Google</a>
+    </div>
+
+    <div id="user-info" class="user-info">
+        <h2>Authenticated Successfully!</h2>
+        <img id="user-picture" src="" alt="Profile Picture">
+        <p><strong>Name:</strong> <span id="user-name"></span></p>
+        <p><strong>Email:</strong> <span id="user-email"></span></p>
+        <p><strong>Locale:</strong> <span id="user-locale"></span></p>
+    </div>
+</div>
+
+<script>
+    // Fetch the user information from the backend
+    fetch('/api/user')
+        .then(response => {
+            if (response.ok && response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Not authenticated");
+            }
+        })
+        .then(data => {
+            if (data && Object.keys(data).length > 0) {
+                // User is authenticated, populate and show UI
+                document.getElementById('user-name').textContent = data.name || data.given_name;
+                document.getElementById('user-email').textContent = data.email;
+                document.getElementById('user-picture').src = data.picture;
+                document.getElementById('user-locale').textContent = data.locale;
+                
+                document.getElementById('user-info').style.display = 'block';
+            } else {
+                // No user data, show login
+                document.getElementById('login-section').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user:', error);
+            // Show login on error
+            document.getElementById('login-section').style.display = 'block';
+        });
+</script>
+
+</body>
+</html>
